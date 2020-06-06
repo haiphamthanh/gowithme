@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/xml"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os"
 )
 
@@ -35,13 +35,26 @@ func main() {
 	}
 	defer xmlFile.Close()
 
-	xmlData, err := ioutil.ReadAll(xmlFile)
-	if err != nil {
-		fmt.Println("Error reading XML data:", err)
-		return
-	}
+	decoder := xml.NewDecoder(xmlFile)
+	for {
+		t, err := decoder.Token()
+		if err == io.EOF {
+			break
+		}
 
-	var post Post
-	xml.Unmarshal(xmlData, &post)
-	fmt.Println(post)
+		if err != nil {
+			fmt.Println("Error decoding XML into tokens:", err)
+			return
+		}
+
+		switch se := t.(type) {
+		case xml.StartElement:
+			if se.Name.Local == "comment" {
+				var comment Comment
+				decoder.DecodeElement(&comment, &se)
+
+				fmt.Println(comment)
+			}
+		}
+	}
 }
