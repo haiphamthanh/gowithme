@@ -3,8 +3,7 @@ package main
 import (
 	"encoding/xml"
 	"fmt"
-	"io"
-	"os"
+	"io/ioutil"
 )
 
 type Post struct {
@@ -28,33 +27,23 @@ type Comment struct {
 }
 
 func main() {
-	xmlFile, err := os.Open("./xml/post.xml")
+	post := Post{
+		Id:      "1",
+		Content: "Hello world",
+		Author: Author{
+			Id:   "1",
+			Name: "Shau sheng",
+		},
+	}
+
+	output, err := xml.MarshalIndent(&post, "", "\t")
 	if err != nil {
-		fmt.Println("Error opening XML file:", err)
+		fmt.Println("Error mashalling to XML: ", err)
 		return
 	}
-	defer xmlFile.Close()
-
-	decoder := xml.NewDecoder(xmlFile)
-	for {
-		t, err := decoder.Token()
-		if err == io.EOF {
-			break
-		}
-
-		if err != nil {
-			fmt.Println("Error decoding XML into tokens:", err)
-			return
-		}
-
-		switch se := t.(type) {
-		case xml.StartElement:
-			if se.Name.Local == "comment" {
-				var comment Comment
-				decoder.DecodeElement(&comment, &se)
-
-				fmt.Println(comment)
-			}
-		}
+	err = ioutil.WriteFile("post.xml", []byte(xml.Header+string(output)), 0644)
+	if err != nil {
+		fmt.Println("Error writing XML to file: ", err)
+		return
 	}
 }
