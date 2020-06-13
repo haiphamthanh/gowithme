@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/xml"
 	"fmt"
-	"io/ioutil"
+	"os"
 )
 
 type Post struct {
@@ -32,18 +32,23 @@ func main() {
 		Content: "Hello world",
 		Author: Author{
 			Id:   "1",
-			Name: "Shau sheng",
+			Name: "Shau sheng new",
 		},
 	}
 
-	output, err := xml.MarshalIndent(&post, "", "\t")
+	// Create file
+	xmlFile, err := os.Create("post.xml")
 	if err != nil {
-		fmt.Println("Error mashalling to XML: ", err)
+		fmt.Println("Error creating XML file: ", err)
 		return
 	}
-	err = ioutil.WriteFile("post.xml", []byte(xml.Header+string(output)), 0644)
+
+	// Encode
+	encode := xml.NewEncoder(xmlFile)
+	encode.Indent("", "\t")
+	err = encode.Encode(&post)
 	if err != nil {
-		fmt.Println("Error writing XML to file: ", err)
+		fmt.Println("Error encoding XML to file: ", err)
 		return
 	}
 }
