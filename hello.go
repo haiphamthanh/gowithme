@@ -1,43 +1,53 @@
 package main
 
-import "fmt"
+import "net/http"
 
 type Post struct {
-	Id      int
-	Content string
-	Author  string
-}
-
-var postById map[int]*Post
-var postsByAuthor map[string][]*Post
-
-func store(post Post) {
-	postById[post.Id] = &post
-	postsByAuthor[post.Author] = append(postsByAuthor[post.Author], &post)
+	Id      int    `json: "id"`
+	Content string `json:"content"`
+	Author  string `json:"author"`
 }
 
 func main() {
-	postById = make(map[int]*Post)
-	postsByAuthor = make(map[string][]*Post)
-
-	post1 := Post{Id: 1, Content: "Hello world!", Author: "Sau sheong"}
-	post2 := Post{Id: 2, Content: "Bonjour Monde!", Author: "Pierre"}
-	post3 := Post{Id: 3, Content: "Hola Mundo!", Author: "Pedro"}
-	post4 := Post{Id: 4, Content: "Gretting Earthlings!", Author: "Shau Sheong"}
-
-	store(post1)
-	store(post2)
-	store(post3)
-	store(post4)
-
-	fmt.Println(postById[1])
-	fmt.Println(postById[2])
-
-	for _, post := range postsByAuthor["Shau Sheong"] {
-		fmt.Println(post)
+	server := http.Server{
+		Addr: "127.0.0.1:8080",
 	}
 
-	for _, post := range postsByAuthor["Pedro"] {
-		fmt.Println(post)
+	http.HandleFunc("/posts/", handleRequest)
+	server.ListenAndServe()
+}
+
+func handleRequest(w http.ResponseWriter, r *http.Request) {
+	var err error
+	switch r.Method {
+	case "GET":
+		err = handleGet(w, r)
+	case "POST":
+		err = handlePost(w, r)
+	case "PUT":
+		err = handlePut(w, r)
+	case "DELETE":
+		err = handleDelete(w, r)
 	}
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+func handleGet(w http.ResponseWriter, r *http.Request) (err error) {
+	return
+}
+
+func handlePost(w http.ResponseWriter, r *http.Request) (err error) {
+	return
+}
+
+func handlePut(w http.ResponseWriter, r *http.Request) (err error) {
+	return
+}
+
+func handleDelete(w http.ResponseWriter, r *http.Request) (err error) {
+	return
 }
