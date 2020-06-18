@@ -91,6 +91,30 @@ func handlePost(w http.ResponseWriter, r *http.Request) (err error) {
 }
 
 func handlePut(w http.ResponseWriter, r *http.Request) (err error) {
+	// Retrieve item from id
+	id, err := strconv.Atoi(path.Base(r.URL.Path))
+	if err != nil {
+		return
+	}
+
+	post, err := retrieve(id)
+	if err != nil {
+		return
+	}
+
+	// Get data to update
+	len := r.ContentLength
+	body := make([]byte, len)
+	r.Body.Read(body)
+	json.Unmarshal(body, &post)
+
+	// Update
+	post.update()
+	if err != nil {
+		return
+	}
+
+	w.WriteHeader(200)
 	return
 }
 
