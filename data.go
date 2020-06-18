@@ -11,7 +11,7 @@ var Db *sql.DB
 
 func init() {
 	var err error
-	Db, err = sql.Open("postgres", "user=gwp, dbname=gwp password=gwp ssl-mode=disable")
+	Db, err = sql.Open("postgres", "user=gwp dbname=gwp password=gwp sslmode=disable")
 	if err != nil {
 		panic(err)
 	}
@@ -19,7 +19,7 @@ func init() {
 
 func (post *Post) create() (err error) {
 	// create statement
-	statement := "insert into posts (content, author,) values ($1, $2) returning id"
+	statement := "insert into posts (content, author) values ($1, $2) returning id"
 
 	// exec statment
 	stmt, err := Db.Prepare(statement)
@@ -29,7 +29,7 @@ func (post *Post) create() (err error) {
 	defer stmt.Close()
 
 	// query check insert
-	err = Db.QueryRow(post.Content, post.Author).Scan(&post.Id)
+	err = stmt.QueryRow(post.Content, post.Author).Scan(&post.Id)
 	return
 }
 

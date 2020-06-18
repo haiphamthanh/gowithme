@@ -1,3 +1,5 @@
+// To install the driver: Go get "<path>"
+
 package main
 
 import (
@@ -18,7 +20,7 @@ func main() {
 		Addr: "127.0.0.1:8080",
 	}
 
-	http.HandleFunc("/posts/", handleRequest)
+	http.HandleFunc("/post/", handleRequest)
 	server.ListenAndServe()
 }
 
@@ -69,6 +71,22 @@ func handleGet(w http.ResponseWriter, r *http.Request) (err error) {
 }
 
 func handlePost(w http.ResponseWriter, r *http.Request) (err error) {
+	// Get len body
+	len := r.ContentLength
+	body := make([]byte, len)
+
+	// Get body with length
+	r.Body.Read(body)
+
+	// Unmarshal data
+	var post Post
+	json.Unmarshal(body, &post)
+	err = post.create()
+	if err != nil {
+		return
+	}
+
+	w.WriteHeader(200)
 	return
 }
 
