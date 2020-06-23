@@ -1,3 +1,4 @@
+/*
 // To install the driver: Go get "<path>"
 
 package main
@@ -139,3 +140,4 @@ func handleDelete(w http.ResponseWriter, r *http.Request) (err error) {
 	w.WriteHeader(200)
 	return
 }
+*/
